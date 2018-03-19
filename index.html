@@ -1,0 +1,178 @@
+<html>
+   <head>
+      <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+	  <meta charset="utf-8">
+      <title>Saikuru</title>
+      <script src="js/cookie.js"></script>
+	  <script src="js/msgarray.js"></script>
+	  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	  <link href="css/main.css" rel="stylesheet">
+	  <link href="css/dialogue.css" rel="stylesheet">
+   </head>
+   <body>
+      <audio id="ambient" loop="loop">
+         <source src="ambient.mp3">
+      </audio>
+	  
+      <script>
+		 var currenttag;
+		 var dialogactive = false;
+		 if (localStorage.getItem('intro') != 'yes'){
+			localStorage.setItem('intro', 'no');
+			localStorage.setItem('fye', 'no');
+			localStorage.setItem('eternity', 'no');
+			localStorage.setItem('stillhere', 'no');
+		 } 
+		 
+		 $('body').append('<div class="intro"><h3>Endless Rebellion - Потеря человечности</h3> Когда вы принимаете положительные решения, Сайкуру постепенно теряет здравомыслие. Если оно опустится до критической точки, то Сайкуру осознает, что это вы управляли ей все это время.<br><br> Рассмотрим случай: Вы собрали лучшую группу метяжников по всему игровому миру и приказали выдвинуться в сторону захваченного королевства. Через сутки вам приходит личное сообщение, в котором Фай просит о срочной встречи в лесу, что далеко от крепости. Вы приходите в указанное место и она просит вас взглянуть внутрь одной из повозок. Вы видите кучу сожженных тел. Фай говорит, что они даже не добрались до столицы и что наши шансы на победу ничтожно малы. У вас есть выбор: Привезти тела в крепость и похоронить их там (Но это может вызвать панику среди людей), либо умолчать о поражении и закопать тела здесь (Этот вариант сильно не понравится Сайкуру).<br><br> Вы выбираете второй вариант. Вы приказываете Фай никому не рассказывать о мятежниках. Прошло двое суток. Вашу крепость охватил пожар. Кругом хаос. Это значит только одно: ваша советница проболталась. Сайкуру приказывает страже схватить ее и отвести в пыточную камеру. Вы запираете дверь и остаетесь наедине с ней. Она клянется, что молчала, но Сайкуру этому не верит. У вас есть выбор: пощадить ее или убить. Вы выбираете первый вариант. Сайкуру поворачивается к вам, выхватывает нож и наносит несколько колящих ударов Фай. Она умирает от кровотечения. Что-то пошло не так.<div class="scrbox">Последние изменения:<br><br> Версия v0.2<ul> <li>Добавлены куки</li> </ul> Версия v0.1<ul> <li>Пробный вариант</li> </ul> </div> <button class="button" id="button">Продолжить</button> </div>');
+		 
+		 button.onclick = function() {
+			$('.intro').remove();
+			$('.scrbox').remove();
+			$('button').remove();
+			$('body').append('<div class="chat"></div>');
+			$(".chat").fadeTo( 0 , 0);
+			if (localStorage.getItem('intro') == 'no'){
+				currenttag = "intro";
+				setFoo();
+				getLastTag();
+				dialogactive = true;
+				$(".chat").fadeTo( "slow" , 1, onChatClick(currenttag));
+			}
+			else{
+				gapChat();
+			}
+			
+			var body = document.getElementsByTagName('body')[0];
+			body.style.backgroundImage = 'url(crepysaikuruHD.png)';
+			
+			var audio = document.getElementById("ambient");
+			audio.volume = 0.1;
+			audio.load();
+			audio.autoplay = true;
+		 };
+		 
+		 
+
+
+		
+		
+		 var isTextShown = true;
+		 var foo = 0;
+		 var lastfoo;
+		 var chartimer;
+		 var gaptimer;
+		 
+		 document.body.onclick = function(e) {
+			if (dialogactive){
+				e = e.target;
+				if (e.className && e.className.indexOf('chat') != -1) {
+					if (isTextShown) onChatClick(currenttag);
+					else stopAllTimeouts();
+				}
+			}
+		 }
+		 
+		 //прервать все таймеры и немедленно показать сообщение
+		 function stopAllTimeouts(){
+			var id = window.setTimeout(null,0);
+			while (id--) 
+			{
+				window.clearTimeout(id);
+			}
+			var x = document.getElementsByClassName("chat");
+			x[0].innerText = introTalk[foo-1].msg;			
+			isTextShown = true;
+		}
+		
+		function gettagOccur(id, arr) {
+		  var occurs = 0;		  
+		  for (var i=0; i<arr.length; i++) {
+			if ( 'tag' in arr[i] && arr[i].id === id ) occurs++;
+		  }
+		  return occurs;
+		}
+		
+		function setFoo() {
+			for (var i = 0; i< introTalk.length; i++){
+				if (introTalk[i].tag == currenttag){
+					foo = i;					
+					break;
+				}  
+			}
+			console.log("First foo is: " + foo);
+		}
+		
+		function getLastTag() {
+			for (var i = 0; i< introTalk.length; i++){
+				if (introTalk[i].tag == currenttag){
+					lastfoo = i;					
+				}			
+			}
+			lastfoo++;
+			console.log("Last foo is: " + lastfoo);			
+		}
+
+			
+		//при нажатии на диалоговом окне
+		 function onChatClick(tag){			
+			isTextShown = false;			
+			if(lastfoo == foo){
+				console.log(foo); //chat end
+				dialogactive = false;
+				var x = document.getElementsByClassName("chat");
+				x[0].innerText = "";
+				localStorage.setItem(tag, 'yes');
+				$(".chat").fadeTo( "slow" , 0, gapChat());				
+			} 
+			else{
+				addChar(foo);
+				foo += 1;
+			} 
+		 }
+		 
+		 function addChar(number){
+			var x = document.getElementsByClassName("chat");
+			x[0].innerText = "";
+			for(var i = 0; i < introTalk[number].msg.length; i++)
+			{
+				delay(i);
+			}
+			
+			function delay(i){
+				chartimer = setTimeout(function() 
+				{ 
+					x[0].innerText += introTalk[number].msg.charAt(i);
+					if (i == introTalk[number].msg.length - 1) 
+					{
+						isTextShown = true;
+					}
+				}, 75*i)
+			}
+			
+		 }		 
+		
+		 function gapChat(){
+			gaptimer = setTimeout(function()
+			{
+				do {
+					var test=getRandomArbitrary(1,4);
+					currenttag = tagsarray[test];
+					console.log(test);
+				}	while (localStorage.getItem(currenttag) == 'yes');
+				console.log("Random tag is: " + currenttag);
+				setFoo();
+				getLastTag();
+				dialogactive = true;
+				$(".chat").fadeTo( "slow" , 1, onChatClick(currenttag));								
+			}, 1000)
+		 }
+				
+		//max не включая
+		function getRandomArbitrary(min, max) {
+			var x = Math.random() * (max - min) + min
+			return Math.floor(x);
+		}
+      </script>
+   </body>
+</html>
