@@ -164,7 +164,7 @@
 			gaptimer = setTimeout(function()
 			{
 				do {
-					var test=getRandomArbitrary(1,4);
+					var test=getRandomArbitrary(1,tagsarray.length + 1);
 					currenttag = tagsarray[test];
 					console.log(test);
 				}	while (localStorage.getItem(currenttag) == 'yes');
